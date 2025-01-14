@@ -56,8 +56,6 @@ class FolderCreationDialog: UIView {
         cancelButton.layer.cornerRadius = 8
         cancelButton.setTitleColor(.black, for: .normal)
         cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 15)
-
-//        cancelButton.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
         
         buttonStackView = UIStackView(arrangedSubviews: [createButton, cancelButton])

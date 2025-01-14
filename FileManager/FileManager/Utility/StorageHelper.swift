@@ -7,10 +7,8 @@
 import Foundation
 
 class StorageHelper {
-    
-    static let sharedInstance = StorageHelper()
-    
-    func createFolder(folderName: String) -> String? {
+        
+    static func createFolder(folderName: String) -> String? {
         let fileManager = FileManager.default
         guard let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
             print("Could not access Documents directory.")

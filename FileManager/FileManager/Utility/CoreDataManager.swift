@@ -13,10 +13,12 @@ class CoreDataManager {
     
     func storeFolderDetails(name: String, path: String, createdDate: Date) {
         let folder = FolderEntity(context: context)
+        let colorString = ColorConverter.colorToHex(color: .gray)
         folder.folderName = name
         folder.folderPath = path
         folder.createdDate = createdDate
         folder.isFavorite = false
+        folder.folderColor = colorString
         do {
             try context.save()
             print("folder created successfully")

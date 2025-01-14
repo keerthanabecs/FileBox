@@ -21,17 +21,22 @@ class FolderViewController: UIViewController {
         setupCollectionView()
         setupAddButton()
         setupConstrains()
+        setupCreationDialog()
     }
     
     func setupCollectionView() {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
+        layout.minimumLineSpacing = 16
+        layout.minimumInteritemSpacing = 16
+        layout.sectionInset = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
+    
         folderCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         folderCollectionView.translatesAutoresizingMaskIntoConstraints = false
-//        folderCollectionView.delegate = self
-//        folderCollectionView.dataSource = self
+        folderCollectionView.delegate = self
+        folderCollectionView.dataSource = self
         folderCollectionView.backgroundColor = .white
-        folderCollectionView.register(UINib(nibName: "foldersCell", bundle: nil), forCellWithReuseIdentifier : "foldersCell")
+        folderCollectionView.register(FolderCell.self, forCellWithReuseIdentifier: FolderCell.identifier)
         view.addSubview(folderCollectionView)
     }
     
@@ -42,6 +47,12 @@ class FolderViewController: UIViewController {
         config.baseForegroundColor = .white
         config.baseBackgroundColor = .systemBlue
         config.cornerStyle = .capsule
+        
+        if let icon = UIImage(systemName: "plus") {
+            config.image = icon
+            config.imagePadding = 8
+            config.imagePlacement = .leading
+        }
         addFolderBtn.configuration = config
         addFolderBtn.translatesAutoresizingMaskIntoConstraints = false
         addFolderBtn.addTarget(self, action: #selector(addButtonAction), for: .touchUpInside)
@@ -54,12 +65,12 @@ class FolderViewController: UIViewController {
         folderCreationDialog.createButton.addTarget(self, action: #selector(createFolderAction), for: .touchUpInside)
         folderCreationDialog.cancelButton.addTarget(self, action: #selector(cancalBtnAction), for: .touchUpInside)
         self.view.addSubview(folderCreationDialog)
-        self.view.bringSubviewToFront(folderCreationDialog)
+        folderCreationDialog.isHidden = true
         NSLayoutConstraint.activate([
-        folderCreationDialog.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-        folderCreationDialog.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
-        folderCreationDialog.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.8),
-        folderCreationDialog.heightAnchor.constraint(equalToConstant: 180)
+            folderCreationDialog.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
+            folderCreationDialog.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
+            folderCreationDialog.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.8),
+            folderCreationDialog.heightAnchor.constraint(equalToConstant: 180)
         ])
     }
     
@@ -79,51 +90,51 @@ class FolderViewController: UIViewController {
     }
     
     @objc func addButtonAction() {
-        setupCreationDialog()
+        folderCreationDialog.isHidden = false
+        addFolderBtn.isHidden = true
     }
     
     @objc func createFolderAction() {
-        if let name = folderCreationDialog.textField.text {
-            viewModel?.createFolder(folderName: name)
-            folders = viewModel!.folderEntities
-        } else {
-            print("please enter folder name")
+        DispatchQueue.main.async { [self] in
+            if let name = folderCreationDialog.textField.text {
+                viewModel?.createFolder(folderName: name)
+                folders = viewModel!.folderEntities
+                self.folderCreationDialog.isHidden = true
+                self.addFolderBtn.isHidden = false
+                self.folderCollectionView.reloadData()
+            } else {
+                print("please enter folder name")
+            }
         }
     }
     
     @objc func cancalBtnAction() {
+        folders = viewModel!.folderEntities
+        self.folderCreationDialog.isHidden = true
+        self.addFolderBtn.isHidden = false
+        self.folderCollectionView.reloadData()
     }
 
 }
 
-//extension FolderViewController : UICollectionViewDelegate, UICollectionViewDataSource , UICollectionViewDelegateFlowLayout{
-//    
-//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        return folders.count
-//    }
-//    
-//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-//        let cell = self.folderCollectionView.dequeueReusableCell(withReuseIdentifier: "foldersCell", for: indexPath) as! foldersCell
-//        cell.folderName.text = self.folders[indexPath.row].folderName
-//        return cell
-//    }
-//    
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-//        return CGSize(width: 200, height: self.folderCollectionView.frame.size.height)
-//    }
-//    
-//    
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-//        return 10.0
-//    }
-//    
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-//        return 10.0
-//    }
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-//        return UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
-//    }
-//    
-//}
+extension FolderViewController : UICollectionViewDelegate, UICollectionViewDataSource , UICollectionViewDelegateFlowLayout{
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return folders.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FolderCell.identifier, for: indexPath) as? FolderCell else {
+            return UICollectionViewCell()
+        }
+        cell.setupFolder(folderDetail: self.folders[indexPath.row])
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: (folderCollectionView.frame.size.width - 48)/2, height: 150)
+    }
+    
+}
 
 
