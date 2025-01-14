@@ -114,6 +114,7 @@ class FolderViewController: UIViewController {
         self.addFolderBtn.isHidden = false
         self.folderCollectionView.reloadData()
     }
+    
 
 }
 
@@ -127,7 +128,8 @@ extension FolderViewController : UICollectionViewDelegate, UICollectionViewDataS
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FolderCell.identifier, for: indexPath) as? FolderCell else {
             return UICollectionViewCell()
         }
-        cell.setupFolder(folderDetail: self.folders[indexPath.row])
+        cell.setupFolder(folderDetail: self.folders[indexPath.row], _index: indexPath.row)
+        cell.moredelegate = self
         return cell
     }
     
@@ -138,3 +140,13 @@ extension FolderViewController : UICollectionViewDelegate, UICollectionViewDataS
 }
 
 
+extension FolderViewController: MoreOptionDelegate {
+    func moreButtonTapped(index: Int) {
+        let menuVC = FolderMenuView()
+        menuVC.index = index
+        menuVC.foldername = viewModel.folderEntities[index].folderName
+        menuVC.modalPresentationStyle = .overCurrentContext
+        self.present(menuVC, animated: true)
+    }
+
+}

@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol MoreOptionDelegate {
+    func moreButtonTapped(index: Int)
+}
+
 class FolderCell: UICollectionViewCell {
     
     var titleStackView: UIStackView!
@@ -15,7 +19,8 @@ class FolderCell: UICollectionViewCell {
     var titleLabel: UILabel!
     var titleImageView: UIImageView!
     var moreButton: UIButton!
-    
+    var moredelegate: MoreOptionDelegate?
+    var index: Int!
     static let identifier = "FolderCell"
     
     override init(frame: CGRect) {
@@ -43,10 +48,6 @@ class FolderCell: UICollectionViewCell {
         titleLabel.textColor = .black
     }
 
-    private func setupMoreButton() {
-      
-    }
-    
     func setupUI() {
         contentView.backgroundColor = UIColor(red: 237/255.0, green: 241/255.0, blue: 239/255.0, alpha: 1.0)
         contentView.layer.cornerRadius = 10
@@ -82,6 +83,7 @@ class FolderCell: UICollectionViewCell {
         moreButton.translatesAutoresizingMaskIntoConstraints = false
         moreButton.setImage(UIImage(named: "more"), for: .normal)
         moreButton.tintColor = .gray
+        moreButton.addTarget(self, action: #selector(moreButtonTapped), for: .touchUpInside)
         
         titleStackView = UIStackView(arrangedSubviews: [titleImageView,titleLabel,moreButton])
         titleStackView.axis = .horizontal
@@ -110,8 +112,13 @@ class FolderCell: UICollectionViewCell {
         ])
     }
     
-    func setupFolder(folderDetail: FolderEntity) {
+    func setupFolder(folderDetail: FolderEntity, _index: Int) {
         folderImageView.tintColor = .gray
         titleLabel.text = folderDetail.folderName
+        index = _index
+    }
+    
+    @objc func moreButtonTapped() {
+        moredelegate?.moreButtonTapped(index: index)
     }
 }
