@@ -30,20 +30,65 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		45A20FD82D34E87D009313AE /* Exceptions for "FileManager" folder in "FileManager" target */ = {
+		459443E82D37D4D300E62BB8 /* Exceptions for "FileManager" folder in "FileManager" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				"/Localized: LaunchScreen.storyboard",
+				"/Localized: Main.storyboard",
+				AppDelegate/AppDelegate.swift,
+				AppDelegate/SceneDelegate.swift,
+				Assets.xcassets,
+				"CoreData/FolderEntity+CoreDataClass.swift",
+				"CoreData/FolderEntity+CoreDataProperties.swift",
+				FileManager.xcdatamodeld,
+				Folder/View/FolderCell/FolderCell.swift,
+				Folder/View/FolderCreationView/FolderCreationDialog.swift,
+				Folder/View/FolderViewController.swift,
+				Folder/ViewModel/FolderViewModel.swift,
+				FolderMenuOption/Model/FolderMenuOption.swift,
+				FolderMenuOption/View/FolderMenuView.swift,
+				FolderMenuOption/View/IconLabelCell/IconLabelCell.swift,
+				FolderMenuOption/ViewModel/FolderMenuViewModel.swift,
+				Utility/ColorConverter.swift,
+				Utility/CoreDataManager.swift,
+				Utility/StorageHelper.swift,
 			);
 			target = 45D5F5A82D344DEE00DBD69F /* FileManager */;
+		};
+		459443EA2D37D4D300E62BB8 /* Exceptions for "FileManager" folder in "FileManagerTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"/Localized: LaunchScreen.storyboard",
+				"/Localized: Main.storyboard",
+				AppDelegate/AppDelegate.swift,
+				AppDelegate/SceneDelegate.swift,
+				Assets.xcassets,
+				"CoreData/FolderEntity+CoreDataClass.swift",
+				"CoreData/FolderEntity+CoreDataProperties.swift",
+				FileManager.xcdatamodeld,
+				Folder/View/FolderCell/FolderCell.swift,
+				Folder/View/FolderCreationView/FolderCreationDialog.swift,
+				Folder/View/FolderViewController.swift,
+				Folder/ViewModel/FolderViewModel.swift,
+				FolderMenuOption/Model/FolderMenuOption.swift,
+				FolderMenuOption/View/FolderMenuView.swift,
+				FolderMenuOption/View/IconLabelCell/IconLabelCell.swift,
+				FolderMenuOption/ViewModel/FolderMenuViewModel.swift,
+				Info.plist,
+				Utility/ColorConverter.swift,
+				Utility/CoreDataManager.swift,
+				Utility/StorageHelper.swift,
+			);
+			target = 45D5F5C12D344DEF00DBD69F /* FileManagerTests */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		45A20FCA2D34E87D009313AE /* FileManager */ = {
+		459443D42D37D4D300E62BB8 /* FileManager */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				45A20FD82D34E87D009313AE /* Exceptions for "FileManager" folder in "FileManager" target */,
+				459443E82D37D4D300E62BB8 /* Exceptions for "FileManager" folder in "FileManager" target */,
+				459443EA2D37D4D300E62BB8 /* Exceptions for "FileManager" folder in "FileManagerTests" target */,
 			);
 			path = FileManager;
 			sourceTree = "<group>";
@@ -88,7 +133,7 @@
 		45D5F5A02D344DEE00DBD69F = {
 			isa = PBXGroup;
 			children = (
-				45A20FCA2D34E87D009313AE /* FileManager */,
+				459443D42D37D4D300E62BB8 /* FileManager */,
 				45D5F5C52D344DEF00DBD69F /* FileManagerTests */,
 				45D5F5CF2D344DEF00DBD69F /* FileManagerUITests */,
 				45D5F5AA2D344DEE00DBD69F /* Products */,
@@ -120,9 +165,6 @@
 			);
 			dependencies = (
 			);
-			fileSystemSynchronizedGroups = (
-				45A20FCA2D34E87D009313AE /* FileManager */,
-			);
 			name = FileManager;
 			packageProductDependencies = (
 			);
@@ -144,6 +186,7 @@
 				45D5F5C42D344DEF00DBD69F /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
+				459443D42D37D4D300E62BB8 /* FileManager */,
 				45D5F5C52D344DEF00DBD69F /* FileManagerTests */,
 			);
 			name = FileManagerTests;

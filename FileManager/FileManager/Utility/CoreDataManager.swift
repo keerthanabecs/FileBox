@@ -11,7 +11,7 @@ class CoreDataManager {
     static let sharedInstance = CoreDataManager()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
-    func storeFolderDetails(name: String, path: String, createdDate: Date) {
+    func storeFolderDetails(name: String, path: String, createdDate: Date) -> (Bool, String) {
         let folder = FolderEntity(context: context)
         let colorString = ColorConverter.colorToHex(color: .gray)
         folder.folderName = name
@@ -22,8 +22,10 @@ class CoreDataManager {
         do {
             try context.save()
             print("folder created successfully")
+            return (true,"")
         } catch {
             print("failed: \(error.localizedDescription)")
+            return (false, error.localizedDescription)
         }
     }
     
@@ -38,7 +40,7 @@ class CoreDataManager {
         }
     }
     
-    func updateOrDeleteFolder(folderName: String, folderPath: String, menuType: MenuType, isFavorite: Bool = false, color: String) {
+    func updateOrDeleteFolder(folderName: String, folderPath: String, menuType: MenuType, isFavorite: Bool = false, color: String = "") -> (Bool, String) {
         let fetchRequest: NSFetchRequest<FolderEntity> = FolderEntity.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "folderName == %@ AND folderPath == %@", folderName,folderPath)
         do {
@@ -53,12 +55,14 @@ class CoreDataManager {
                     print("folder deleted successFully")
                 }
                 try context.save()
-                print("Folder updated successfully")
+                return(true, "")
             } else {
                 print("folder not found")
+                return(false, "Folder not found")
             }
         } catch {
             print("Error updating folder: \(error.localizedDescription)")
+            return(false, error.localizedDescription)
         }
     }
 }

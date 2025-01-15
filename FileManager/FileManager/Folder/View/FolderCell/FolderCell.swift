@@ -19,6 +19,7 @@ class FolderCell: UICollectionViewCell {
     var titleLabel: UILabel!
     var titleImageView: UIImageView!
     var moreButton: UIButton!
+    var favoriteImage: UIImageView!
     var moredelegate: MoreOptionDelegate?
     var index: Int!
     static let identifier = "FolderCell"
@@ -73,9 +74,15 @@ class FolderCell: UICollectionViewCell {
         titleImageView.image = UIImage(named: "folder")
         titleImageView.tintColor = .gray
         
+        favoriteImage = UIImageView()
+        favoriteImage.translatesAutoresizingMaskIntoConstraints = false
+        favoriteImage.contentMode = .scaleAspectFit
+        favoriteImage.image = UIImage(named: "star")
+        favoriteImage.isHidden = true
+        
         titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+        titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         titleLabel.textColor = .black
         
         moreButton = UIButton(type: .system)
@@ -87,10 +94,12 @@ class FolderCell: UICollectionViewCell {
         titleStackView = UIStackView(arrangedSubviews: [titleImageView,titleLabel,moreButton])
         titleStackView.axis = .horizontal
         titleStackView.distribution = .fill
-        titleStackView.spacing = 10
+        titleStackView.spacing = 5
         titleStackView.translatesAutoresizingMaskIntoConstraints = false
         
+        
         contentView.addSubview(titleStackView)
+        folderImageView.addSubview(favoriteImage)
         containerView.addSubview(folderImageView)
         contentView.addSubview(containerView)
         NSLayoutConstraint.activate([
@@ -104,6 +113,10 @@ class FolderCell: UICollectionViewCell {
             containerView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             containerView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             containerView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            favoriteImage.widthAnchor.constraint(equalToConstant: 20),
+            favoriteImage.heightAnchor.constraint(equalToConstant: 20),
+            favoriteImage.centerXAnchor.constraint(equalTo: folderImageView.centerXAnchor),
+            favoriteImage.centerYAnchor.constraint(equalTo: folderImageView.centerYAnchor, constant: 5),
             folderImageView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
             folderImageView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
             folderImageView.widthAnchor.constraint(equalToConstant: 80),
@@ -112,8 +125,10 @@ class FolderCell: UICollectionViewCell {
     }
     
     func setupFolder(folderDetail: FolderEntity, _index: Int) {
-        folderImageView.tintColor = .gray
+        folderImageView.tintColor = ColorConverter.hexToColor(hex: folderDetail.folderColor ?? "#808080")
+        titleImageView.tintColor = folderImageView.tintColor
         titleLabel.text = folderDetail.folderName
+        favoriteImage.isHidden = !folderDetail.isFavorite
         index = _index
     }
     

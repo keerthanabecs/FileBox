@@ -6,23 +6,31 @@
 //
 import Foundation
 
-protocol FolderCreationDelegate {
+protocol FolderDelegate {
     func didFolderCreationSuccessfully(msg: String)
-    func didFolderCreationFailed(msg: String)
+    func didFailed(msg: String)
+    func didFolderColorChanged()
+    func didFolderDeleted()
+    func didFolderStarred()
 }
 
 class FolderViewModel {
-    var delegate: FolderCreationDelegate?
+    var delegate: FolderDelegate?
     var folderEntities: [FolderEntity] = []
+    var selectedRow: Int!
     
     func createFolder(folderName: String) {
         let result = StorageHelper.createFolder(folderName: folderName)
         switch result {
         case .success(let folderPath):
             let date = Date()
-            CoreDataManager.sharedInstance.storeFolderDetails(name: folderName, path: folderPath, createdDate: date)
-            folderEntities = CoreDataManager.sharedInstance.fetchFolders()!
-            delegate?.didFolderCreationSuccessfully(msg: "Folder Created successfully")
+            let (success, message) = CoreDataManager.sharedInstance.storeFolderDetails(name: folderName, path: folderPath, createdDate: date)
+            if success {
+                folderEntities = CoreDataManager.sharedInstance.fetchFolders()!
+                delegate?.didFolderCreationSuccessfully(msg: "Folder Created successfully")
+            } else {
+                delegate?.didFailed(msg: message)
+            }
         case .failure(let error):
             var errorMsg: String?
             switch error {
@@ -33,7 +41,7 @@ class FolderViewModel {
             case .unknown:
                 errorMsg = "An unknown error occured"
             }
-            delegate?.didFolderCreationFailed(msg: errorMsg ?? "error")
+            delegate?.didFailed(msg: errorMsg ?? "error")
         }
     }
     
@@ -42,4 +50,49 @@ class FolderViewModel {
             folderEntities = folders
         }
     }
+    
+    func deleteFolder() {
+        let folder = folderEntities[selectedRow]
+        let result = StorageHelper.deleteFolder(folderName: folder.folderName ?? "")
+        switch result {
+        case .success(let folderPath):
+            let (success, message) = CoreDataManager.sharedInstance.updateOrDeleteFolder(folderName: folder.folderName ?? "", folderPath: folder.folderPath ?? folderPath, menuType: .delete)
+            if success {
+                delegate?.didFolderDeleted()
+            } else {
+                delegate?.didFailed(msg: message)
+            }
+        case .failure(let error):
+            var errorMsg: String?
+            switch error {
+            case .notAccess:
+                errorMsg = "Could not access document directory"
+            case .unknown:
+                errorMsg = "An unknown error occured"
+            case .folderNotFound:
+                errorMsg = "Folder not found"
+            }
+            delegate?.didFailed(msg: errorMsg ?? "error")
+        }
+    }
+    
+    func updateFolderColor(color: String) {
+        let folder = folderEntities[selectedRow]
+        let (success, message) =  CoreDataManager.sharedInstance.updateOrDeleteFolder(folderName: folder.folderName ?? "", folderPath: folder.folderPath ?? "", menuType: .changeColor, color: color)
+        if success {
+            delegate?.didFolderColorChanged()
+        } else {
+            delegate?.didFailed(msg: message)
+        }
+    }
+    func updateisFavorite() {
+        let folder = folderEntities[selectedRow]
+        let (success, message) =  CoreDataManager.sharedInstance.updateOrDeleteFolder(folderName: folder.folderName ?? "", folderPath: folder.folderPath ?? "", menuType: .starred, isFavorite: !folder.isFavorite)
+        if success {
+            delegate?.didFolderStarred()
+        } else {
+            delegate?.didFailed(msg: message)
+        }
+    }
+    
 }

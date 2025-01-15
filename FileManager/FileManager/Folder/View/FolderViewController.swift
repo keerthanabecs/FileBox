@@ -13,16 +13,56 @@ class FolderViewController: UIViewController {
     var addFolderBtn: UIButton!
     var folderCreationDialog: FolderCreationDialog!
     private var viewModel: FolderViewModel!
+    var titleLabel: UILabel!
+    var containerView: UIView!
+    var noFoldersLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .white
         viewModel = FolderViewModel()
         viewModel.delegate = self
+        setupTitleView()
+        setupContainerView()
         setupCollectionView()
         setupAddButton()
         setupConstrains()
         setupCreationDialog()
         reloadCollectionView()
+    }
+    
+    func fetchData() {
+        viewModel.fetchFolders()
+        if viewModel.folderEntities.count == 0 {
+            folderCollectionView.isHidden = true
+            noFoldersLabel.isHidden = false
+        } else {
+            folderCollectionView.isHidden = false
+            noFoldersLabel.isHidden = true
+        }
+    }
+    
+    func setupContainerView() {
+        containerView = UIView()
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(containerView)
+        noFoldersLabel = UILabel()
+        noFoldersLabel.text = "No folders have been created yet."
+        noFoldersLabel.textColor = .gray
+        noFoldersLabel.textAlignment = .center
+        noFoldersLabel.translatesAutoresizingMaskIntoConstraints = false
+        noFoldersLabel.font = UIFont.systemFont(ofSize: 18)
+        containerView.addSubview(noFoldersLabel)
+    }
+    
+    func setupTitleView() {
+        titleLabel = UILabel()
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.text = "Folder"
+        titleLabel.font = UIFont.boldSystemFont(ofSize: 24)
+        titleLabel.textColor = .black
+        titleLabel.textAlignment = .center
+        view.addSubview(titleLabel)
     }
     
     func setupCollectionView() {
@@ -38,7 +78,7 @@ class FolderViewController: UIViewController {
         folderCollectionView.dataSource = self
         folderCollectionView.backgroundColor = .white
         folderCollectionView.register(FolderCell.self, forCellWithReuseIdentifier: FolderCell.identifier)
-        view.addSubview(folderCollectionView)
+        containerView.addSubview(folderCollectionView)
     }
     
     func setupAddButton() {
@@ -48,7 +88,6 @@ class FolderViewController: UIViewController {
         config.baseForegroundColor = .white
         config.baseBackgroundColor = .systemBlue
         config.cornerStyle = .capsule
-        
         if let icon = UIImage(systemName: "plus") {
             config.image = icon
             config.imagePadding = 8
@@ -77,10 +116,25 @@ class FolderViewController: UIViewController {
     
     func setupConstrains() {
         NSLayoutConstraint.activate([
-            folderCollectionView.topAnchor.constraint(equalTo: view.topAnchor),
-            folderCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            folderCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            folderCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            titleLabel.heightAnchor.constraint(equalToConstant: 30),
+            
+            containerView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor),
+            containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            
+            folderCollectionView.topAnchor.constraint(equalTo: containerView.topAnchor),
+            folderCollectionView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
+            folderCollectionView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            folderCollectionView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            
+            noFoldersLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor, constant: -30),
+            noFoldersLabel.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+            noFoldersLabel.widthAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 0.7),
+            noFoldersLabel.heightAnchor.constraint(equalToConstant: 80),
             
             addFolderBtn.heightAnchor.constraint(equalToConstant: 50),
             addFolderBtn.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
@@ -106,8 +160,10 @@ class FolderViewController: UIViewController {
     }
     
     func reloadCollectionView() {
-        viewModel.fetchFolders()
-        folderCollectionView.reloadData()
+        fetchData()
+        DispatchQueue.main.async {
+            self.folderCollectionView.reloadData()
+        }
     }
     
     func showFolderList() {
@@ -120,10 +176,14 @@ class FolderViewController: UIViewController {
         showFolderList()
     }
     
-    func showAlert(title: String, msg: String) {
-        let alertController = UIAlertController(title: title, message: msg, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: "OK", style: .default))
-        self.present(alertController, animated: true)
+    func showAlert(title: String, msg: String, completion: (() -> Void)? = nil) {
+        DispatchQueue.main.async {
+            let alertController = UIAlertController(title: title, message: msg, preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "OK", style: .default, handler:  {_ in
+                completion?()
+            }))
+            self.present(alertController, animated: true)
+        }
     }
 }
 
@@ -152,20 +212,81 @@ extension FolderViewController : UICollectionViewDelegate, UICollectionViewDataS
 //MARK: - Menu button delegate
 extension FolderViewController: MoreOptionDelegate {
     func moreButtonTapped(index: Int) {
+        viewModel.selectedRow = index
         let menuVC = FolderMenuView()
-        menuVC.foldername = viewModel.folderEntities[index].folderName
+        menuVC.viewModel.folder = viewModel.folderEntities[index]
+        menuVC.delegate = self
         menuVC.modalPresentationStyle = .overCurrentContext
         self.present(menuVC, animated: true)
     }
 }
 
 //MARK: - Folder create delegation
-extension FolderViewController: FolderCreationDelegate {
+extension FolderViewController: FolderDelegate {
+    func didFailed(msg: String) {
+        showAlert(title: "Error", msg: msg)
+
+    }
+    
+    func didFolderColorChanged() {
+        showAlert(title: "Success", msg: "Folder Color Changes Successfully") {
+            self.reloadCollectionView()
+        }
+        
+    }
+    
+    func didFolderDeleted() {
+        showAlert(title: "Success", msg: "Folder Deleted Successfully") {
+            self.reloadCollectionView()
+        }
+    }
+    
+    func didFolderStarred() {
+        showAlert(title: "Success", msg: "Folder Marked Successfully") {
+            self.reloadCollectionView()
+        }
+    }
+    
     func didFolderCreationSuccessfully(msg: String) {
         showAlert(title: "Success", msg: msg)
     }
-    
-    func didFolderCreationFailed(msg: String) {
-        showAlert(title: "Error", msg: msg)
+}
+
+extension FolderViewController: FolderMenuDelegate {
+    func didMenuTapped(type: MenuType) {
+        if type == .starred {
+            viewModel.updateisFavorite()
+        } else if type == .changeColor {
+            showColorPicker()
+        } else if type == .delete {
+            viewModel.deleteFolder()
+        }
     }
+    
+    func didFavoriteTapped() {
+        viewModel.updateisFavorite()
+    }
+    
+    func didColorChageTapped() {
+        showColorPicker()
+    }
+  
+    func showColorPicker() {
+        DispatchQueue.main.async {
+            let colorPicker = UIColorPickerViewController()
+            colorPicker.delegate = self
+            self.present(colorPicker, animated: true)
+        }
+    }
+}
+
+extension FolderViewController: UIColorPickerViewControllerDelegate {
+    func colorPickerViewControllerDidFinish(_ viewController: UIColorPickerViewController) {
+        let color = viewController.selectedColor
+        if color != .white && color != . black {
+            let hexColor = ColorConverter.colorToHex(color: color)
+            viewModel.updateFolderColor(color: hexColor)
+        }
+    }
+    
 }

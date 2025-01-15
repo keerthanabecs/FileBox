@@ -7,20 +7,23 @@
 
 import UIKit
 
+protocol FolderMenuDelegate {
+    func didMenuTapped(type: MenuType)
+}
+
 class FolderMenuView: UIViewController {
     
     var tableView: UITableView!
-    var viewModel: FolderMenuViewModel!
+    var viewModel: FolderMenuViewModel = FolderMenuViewModel()
     var foldeNameLbl: UILabel!
     var containerView: UIView!
     var index: Int!
     var titleStack: UIStackView!
     var closeButton: UIButton!
-    var foldername: String?
+    var delegate: FolderMenuDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        viewModel = FolderMenuViewModel()
         viewModel.loadMenus()
         setup()
     }
@@ -37,7 +40,7 @@ class FolderMenuView: UIViewController {
         foldeNameLbl.font = UIFont.systemFont(ofSize: 18)
         foldeNameLbl.textColor = .black
         foldeNameLbl.textAlignment = .center
-        foldeNameLbl.text = foldername
+        foldeNameLbl.text = viewModel.folder?.folderName
         foldeNameLbl.translatesAutoresizingMaskIntoConstraints = false
         
         closeButton = UIButton()
@@ -91,11 +94,7 @@ class FolderMenuView: UIViewController {
         self.dismiss(animated: true)
     }
     
-    func showColorPicker() {
-        let colorPicker = UIColorPickerViewController()
-        colorPicker.delegate = self
-        present(colorPicker, animated: true)
-    }
+  
 }
 
 //MARK:- tableview del
@@ -107,30 +106,23 @@ extension FolderMenuView: UITableViewDelegate,UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: IconLabelCell.identifier, for: indexPath) as! IconLabelCell
         let menu = viewModel.menus[indexPath.row]
-        cell.configure(image: menu.icon, title: menu.title)
+        if indexPath.row == 0 {
+            let title = viewModel.folder?.isFavorite ?? false ? "Unfavorite" : "Favorite"
+            cell.configure(image: menu.icon, title: title)
+        } else {
+            cell.configure(image: menu.icon, title: menu.title)
+        }
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let menu = viewModel.menus[indexPath.row]
-        if menu.menuType == .changeColor {
-            showColorPicker()
-        }
-            viewModel.selectMenu(index: indexPath.row)
-        tableView.deselectRow(at: indexPath, animated: true)
+        delegate?.didMenuTapped(type: menu.menuType)
+        self.dismiss(animated: true)
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 60
-    }
-    
-}
-
-extension FolderMenuView: UIColorPickerViewControllerDelegate {
-    func colorPickerViewControllerDidFinish(_ viewController: UIColorPickerViewController) {
-        let color = viewController.selectedColor
-        let hexColor = ColorConverter.colorToHex(color: color)
-        print("folder name \(viewModel.folderEntity?.folderName ?? "") && folderpath \(viewModel.folderEntity?.folderPath ?? "") hex color \(hexColor)")
     }
     
 }
