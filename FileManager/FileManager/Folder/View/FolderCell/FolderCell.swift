@@ -32,7 +32,6 @@ class FolderCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-
     private func setupFolderImageView() {
         folderImageView = UIImageView()
         folderImageView.translatesAutoresizingMaskIntoConstraints = false

@@ -17,6 +17,6 @@ struct MenuItem {
 enum MenuType {
     case delete
     case starred
-    case rename
+//    case rename
     case changeColor
 }

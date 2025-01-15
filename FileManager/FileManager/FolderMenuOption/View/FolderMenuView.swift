@@ -90,8 +90,15 @@ class FolderMenuView: UIViewController {
     @objc func closeButtonTapped() {
         self.dismiss(animated: true)
     }
+    
+    func showColorPicker() {
+        let colorPicker = UIColorPickerViewController()
+        colorPicker.delegate = self
+        present(colorPicker, animated: true)
+    }
 }
 
+//MARK:- tableview del
 extension FolderMenuView: UITableViewDelegate,UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewModel.menus.count
@@ -105,11 +112,25 @@ extension FolderMenuView: UITableViewDelegate,UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        viewModel.selectMenu(index: indexPath.row)
+        let menu = viewModel.menus[indexPath.row]
+        if menu.menuType == .changeColor {
+            showColorPicker()
+        }
+            viewModel.selectMenu(index: indexPath.row)
+        tableView.deselectRow(at: indexPath, animated: true)
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 60
+    }
+    
+}
+
+extension FolderMenuView: UIColorPickerViewControllerDelegate {
+    func colorPickerViewControllerDidFinish(_ viewController: UIColorPickerViewController) {
+        let color = viewController.selectedColor
+        let hexColor = ColorConverter.colorToHex(color: color)
+        print("folder name \(viewModel.folderEntity?.folderName ?? "") && folderpath \(viewModel.folderEntity?.folderPath ?? "") hex color \(hexColor)")
     }
     
 }

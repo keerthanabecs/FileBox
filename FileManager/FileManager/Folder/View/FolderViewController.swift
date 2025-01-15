@@ -13,15 +13,16 @@ class FolderViewController: UIViewController {
     var addFolderBtn: UIButton!
     var folderCreationDialog: FolderCreationDialog!
     private var viewModel: FolderViewModel!
-    var folders: [FolderEntity] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
         viewModel = FolderViewModel()
+        viewModel.delegate = self
         setupCollectionView()
         setupAddButton()
         setupConstrains()
         setupCreationDialog()
+        reloadCollectionView()
     }
     
     func setupCollectionView() {
@@ -64,16 +65,15 @@ class FolderViewController: UIViewController {
         folderCreationDialog.translatesAutoresizingMaskIntoConstraints = false
         folderCreationDialog.createButton.addTarget(self, action: #selector(createFolderAction), for: .touchUpInside)
         folderCreationDialog.cancelButton.addTarget(self, action: #selector(cancalBtnAction), for: .touchUpInside)
-        self.view.addSubview(folderCreationDialog)
+        view.addSubview(folderCreationDialog)
         folderCreationDialog.isHidden = true
         NSLayoutConstraint.activate([
-            folderCreationDialog.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-            folderCreationDialog.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
-            folderCreationDialog.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.8),
+            folderCreationDialog.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            folderCreationDialog.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            folderCreationDialog.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
             folderCreationDialog.heightAnchor.constraint(equalToConstant: 180)
         ])
     }
-    
     
     func setupConstrains() {
         NSLayoutConstraint.activate([
@@ -98,37 +98,47 @@ class FolderViewController: UIViewController {
         DispatchQueue.main.async { [self] in
             if let name = folderCreationDialog.textField.text {
                 viewModel?.createFolder(folderName: name)
-                folders = viewModel!.folderEntities
-                self.folderCreationDialog.isHidden = true
-                self.addFolderBtn.isHidden = false
-                self.folderCollectionView.reloadData()
+                showFolderList()
             } else {
                 print("please enter folder name")
             }
         }
     }
     
-    @objc func cancalBtnAction() {
-        folders = viewModel!.folderEntities
-        self.folderCreationDialog.isHidden = true
-        self.addFolderBtn.isHidden = false
-        self.folderCollectionView.reloadData()
+    func reloadCollectionView() {
+        viewModel.fetchFolders()
+        folderCollectionView.reloadData()
     }
     
-
+    func showFolderList() {
+        folderCreationDialog.isHidden = true
+        addFolderBtn.isHidden = false
+        reloadCollectionView()
+    }
+    
+    @objc func cancalBtnAction() {
+        showFolderList()
+    }
+    
+    func showAlert(title: String, msg: String) {
+        let alertController = UIAlertController(title: title, message: msg, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "OK", style: .default))
+        self.present(alertController, animated: true)
+    }
 }
 
+//MARK: - Folder collectionView delegate and datasource
 extension FolderViewController : UICollectionViewDelegate, UICollectionViewDataSource , UICollectionViewDelegateFlowLayout{
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return folders.count
+        return viewModel.folderEntities.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FolderCell.identifier, for: indexPath) as? FolderCell else {
             return UICollectionViewCell()
         }
-        cell.setupFolder(folderDetail: self.folders[indexPath.row], _index: indexPath.row)
+        cell.setupFolder(folderDetail: viewModel.folderEntities[indexPath.row], _index: indexPath.row)
         cell.moredelegate = self
         return cell
     }
@@ -139,14 +149,23 @@ extension FolderViewController : UICollectionViewDelegate, UICollectionViewDataS
     
 }
 
-
+//MARK: - Menu button delegate
 extension FolderViewController: MoreOptionDelegate {
     func moreButtonTapped(index: Int) {
         let menuVC = FolderMenuView()
-        menuVC.index = index
         menuVC.foldername = viewModel.folderEntities[index].folderName
         menuVC.modalPresentationStyle = .overCurrentContext
         self.present(menuVC, animated: true)
     }
+}
 
+//MARK: - Folder create delegation
+extension FolderViewController: FolderCreationDelegate {
+    func didFolderCreationSuccessfully(msg: String) {
+        showAlert(title: "Success", msg: msg)
+    }
+    
+    func didFolderCreationFailed(msg: String) {
+        showAlert(title: "Error", msg: msg)
+    }
 }
