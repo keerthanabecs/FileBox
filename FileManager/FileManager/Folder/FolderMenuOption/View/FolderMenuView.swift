@@ -14,13 +14,14 @@ protocol FolderMenuDelegate {
 class FolderMenuView: UIViewController {
     
     var tableView: UITableView!
-    var viewModel: FolderMenuViewModel = FolderMenuViewModel()
     var foldeNameLbl: UILabel!
     var containerView: UIView!
-    var index: Int!
     var titleStack: UIStackView!
     var closeButton: UIButton!
+    
     var delegate: FolderMenuDelegate?
+    var viewModel: FolderMenuViewModel = FolderMenuViewModel()
+    var index: Int!
     
     override func viewDidLoad() {
         super.viewDidLoad()

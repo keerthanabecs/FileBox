@@ -30,7 +30,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		459443E82D37D4D300E62BB8 /* Exceptions for "FileManager" folder in "FileManager" target */ = {
+		45174F542D384DE4008D3253 /* Exceptions for "FileManager" folder in "FileManager" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				"/Localized: LaunchScreen.storyboard",
@@ -41,21 +41,21 @@
 				"CoreData/FolderEntity+CoreDataClass.swift",
 				"CoreData/FolderEntity+CoreDataProperties.swift",
 				FileManager.xcdatamodeld,
-				Folder/View/FolderCell/FolderCell.swift,
-				Folder/View/FolderCreationView/FolderCreationDialog.swift,
-				Folder/View/FolderViewController.swift,
-				Folder/ViewModel/FolderViewModel.swift,
-				FolderMenuOption/Model/FolderMenuOption.swift,
-				FolderMenuOption/View/FolderMenuView.swift,
-				FolderMenuOption/View/IconLabelCell/IconLabelCell.swift,
-				FolderMenuOption/ViewModel/FolderMenuViewModel.swift,
+				Folder/FolderMenuOption/Model/FolderMenuOption.swift,
+				Folder/FolderMenuOption/View/FolderMenuView.swift,
+				Folder/FolderMenuOption/View/IconLabelCell/IconLabelCell.swift,
+				Folder/FolderMenuOption/ViewModel/FolderMenuViewModel.swift,
+				Folder/FolderViewController/View/FolderCell/FolderCell.swift,
+				Folder/FolderViewController/View/FolderCreationView/FolderCreationDialog.swift,
+				Folder/FolderViewController/View/FolderViewController.swift,
+				Folder/FolderViewController/ViewModel/FolderViewModel.swift,
 				Utility/ColorConverter.swift,
 				Utility/CoreDataManager.swift,
 				Utility/StorageHelper.swift,
 			);
 			target = 45D5F5A82D344DEE00DBD69F /* FileManager */;
 		};
-		459443EA2D37D4D300E62BB8 /* Exceptions for "FileManager" folder in "FileManagerTests" target */ = {
+		45174F562D384DE4008D3253 /* Exceptions for "FileManager" folder in "FileManagerTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				"/Localized: LaunchScreen.storyboard",
@@ -66,14 +66,14 @@
 				"CoreData/FolderEntity+CoreDataClass.swift",
 				"CoreData/FolderEntity+CoreDataProperties.swift",
 				FileManager.xcdatamodeld,
-				Folder/View/FolderCell/FolderCell.swift,
-				Folder/View/FolderCreationView/FolderCreationDialog.swift,
-				Folder/View/FolderViewController.swift,
-				Folder/ViewModel/FolderViewModel.swift,
-				FolderMenuOption/Model/FolderMenuOption.swift,
-				FolderMenuOption/View/FolderMenuView.swift,
-				FolderMenuOption/View/IconLabelCell/IconLabelCell.swift,
-				FolderMenuOption/ViewModel/FolderMenuViewModel.swift,
+				Folder/FolderMenuOption/Model/FolderMenuOption.swift,
+				Folder/FolderMenuOption/View/FolderMenuView.swift,
+				Folder/FolderMenuOption/View/IconLabelCell/IconLabelCell.swift,
+				Folder/FolderMenuOption/ViewModel/FolderMenuViewModel.swift,
+				Folder/FolderViewController/View/FolderCell/FolderCell.swift,
+				Folder/FolderViewController/View/FolderCreationView/FolderCreationDialog.swift,
+				Folder/FolderViewController/View/FolderViewController.swift,
+				Folder/FolderViewController/ViewModel/FolderViewModel.swift,
 				Info.plist,
 				Utility/ColorConverter.swift,
 				Utility/CoreDataManager.swift,
@@ -84,11 +84,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		459443D42D37D4D300E62BB8 /* FileManager */ = {
+		45174F402D384DE4008D3253 /* FileManager */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				459443E82D37D4D300E62BB8 /* Exceptions for "FileManager" folder in "FileManager" target */,
-				459443EA2D37D4D300E62BB8 /* Exceptions for "FileManager" folder in "FileManagerTests" target */,
+				45174F542D384DE4008D3253 /* Exceptions for "FileManager" folder in "FileManager" target */,
+				45174F562D384DE4008D3253 /* Exceptions for "FileManager" folder in "FileManagerTests" target */,
 			);
 			path = FileManager;
 			sourceTree = "<group>";
@@ -133,7 +133,7 @@
 		45D5F5A02D344DEE00DBD69F = {
 			isa = PBXGroup;
 			children = (
-				459443D42D37D4D300E62BB8 /* FileManager */,
+				45174F402D384DE4008D3253 /* FileManager */,
 				45D5F5C52D344DEF00DBD69F /* FileManagerTests */,
 				45D5F5CF2D344DEF00DBD69F /* FileManagerUITests */,
 				45D5F5AA2D344DEE00DBD69F /* Products */,
@@ -186,7 +186,7 @@
 				45D5F5C42D344DEF00DBD69F /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				459443D42D37D4D300E62BB8 /* FileManager */,
+				45174F402D384DE4008D3253 /* FileManager */,
 				45D5F5C52D344DEF00DBD69F /* FileManagerTests */,
 			);
 			name = FileManagerTests;
@@ -337,8 +337,8 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -368,8 +368,8 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

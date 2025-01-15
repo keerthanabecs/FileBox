@@ -11,11 +11,17 @@ class FolderViewController: UIViewController {
     
     var folderCollectionView: UICollectionView!
     var addFolderBtn: UIButton!
-    var folderCreationDialog: FolderCreationDialog!
-    private var viewModel: FolderViewModel!
     var titleLabel: UILabel!
     var containerView: UIView!
     var noFoldersLabel: UILabel!
+    var filterBtn: UIButton!
+    var sortTableView: UITableView!
+    
+    var filterBtnWidth: CGFloat!
+    var folderCreationDialog: FolderCreationDialog!
+    var selectedSortType: SortType!
+    private var viewModel: FolderViewModel!
+    let defaults = UserDefaults.standard
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,20 +32,10 @@ class FolderViewController: UIViewController {
         setupContainerView()
         setupCollectionView()
         setupAddButton()
+        setupSortTable()
         setupConstrains()
         setupCreationDialog()
         reloadCollectionView()
-    }
-    
-    func fetchData() {
-        viewModel.fetchFolders()
-        if viewModel.folderEntities.count == 0 {
-            folderCollectionView.isHidden = true
-            noFoldersLabel.isHidden = false
-        } else {
-            folderCollectionView.isHidden = false
-            noFoldersLabel.isHidden = true
-        }
     }
     
     func setupContainerView() {
@@ -56,13 +52,42 @@ class FolderViewController: UIViewController {
     }
     
     func setupTitleView() {
+        filterBtn = UIButton(type: .system)
+        var config = UIButton.Configuration.filled()
+        config.title = "Sort"
+        config.baseForegroundColor = .black
+        config.baseBackgroundColor = .white
+        config.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+
+        filterBtn.configuration = config
+        filterBtn.contentHorizontalAlignment = .leading
+        filterBtn.translatesAutoresizingMaskIntoConstraints = false
+        filterBtn.addTarget(self, action: #selector(filterBtnTapped), for: .touchUpInside)
+        
         titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.text = "Folder"
+        titleLabel.text = "File Manager"
         titleLabel.font = UIFont.boldSystemFont(ofSize: 24)
         titleLabel.textColor = .black
         titleLabel.textAlignment = .center
+        
+        view.addSubview(filterBtn)
         view.addSubview(titleLabel)
+    }
+    
+    
+    func setupSortTable() {
+        viewModel.loadSortMenu()
+        sortTableView = UITableView()
+        sortTableView.translatesAutoresizingMaskIntoConstraints = false
+        sortTableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        sortTableView.register(IconLabelCell.self, forCellReuseIdentifier:  IconLabelCell.identifier)
+        sortTableView.delegate = self
+        sortTableView.dataSource = self
+        sortTableView.rowHeight = UITableView.automaticDimension
+        sortTableView.estimatedRowHeight = 30
+        view.addSubview(sortTableView)
+        sortTableView.isHidden = true
     }
     
     func setupCollectionView() {
@@ -71,7 +96,7 @@ class FolderViewController: UIViewController {
         layout.minimumLineSpacing = 16
         layout.minimumInteritemSpacing = 16
         layout.sectionInset = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
-    
+        
         folderCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         folderCollectionView.translatesAutoresizingMaskIntoConstraints = false
         folderCollectionView.delegate = self
@@ -117,11 +142,21 @@ class FolderViewController: UIViewController {
     func setupConstrains() {
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
-            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            titleLabel.heightAnchor.constraint(equalToConstant: 30),
+            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 10),
+            titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 10),
+            titleLabel.heightAnchor.constraint(equalToConstant: 40),
             
-            containerView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor),
+            filterBtn.heightAnchor.constraint(equalToConstant: 40),
+            filterBtn.widthAnchor.constraint(equalToConstant: 120),
+            filterBtn.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 5),
+            filterBtn.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
+            
+            sortTableView.topAnchor.constraint(equalTo: filterBtn.topAnchor),
+            sortTableView.leadingAnchor.constraint(equalTo: filterBtn.trailingAnchor),
+            sortTableView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.6),
+            sortTableView.heightAnchor.constraint(equalToConstant: 200),
+            
+            containerView.topAnchor.constraint(equalTo: filterBtn.bottomAnchor),
             containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -160,8 +195,21 @@ class FolderViewController: UIViewController {
     }
     
     func reloadCollectionView() {
-        fetchData()
-        DispatchQueue.main.async {
+       if defaults.string(forKey: "sortType") == nil {
+           viewModel.fetchFolders()
+       } else {
+           viewModel.fetchSortedFolder()
+           let titleStr = viewModel.getTitle(for: viewModel.selectedSort ?? .dateAsc)
+           changeButtonTitle(newTitle: titleStr!)
+       }
+        DispatchQueue.main.async { [self] in
+            if viewModel.folderEntities.count == 0 {
+                folderCollectionView.isHidden = true
+                noFoldersLabel.isHidden = false
+            } else {
+                folderCollectionView.isHidden = false
+                noFoldersLabel.isHidden = true
+            }
             self.folderCollectionView.reloadData()
         }
     }
@@ -174,6 +222,10 @@ class FolderViewController: UIViewController {
     
     @objc func cancalBtnAction() {
         showFolderList()
+    }
+    
+    @objc func filterBtnTapped() {
+        self.sortTableView.isHidden = false
     }
     
     func showAlert(title: String, msg: String, completion: (() -> Void)? = nil) {
@@ -225,7 +277,7 @@ extension FolderViewController: MoreOptionDelegate {
 extension FolderViewController: FolderDelegate {
     func didFailed(msg: String) {
         showAlert(title: "Error", msg: msg)
-
+        
     }
     
     func didFolderColorChanged() {
@@ -252,6 +304,7 @@ extension FolderViewController: FolderDelegate {
     }
 }
 
+//MARK: -Menupage delegate
 extension FolderViewController: FolderMenuDelegate {
     func didMenuTapped(type: MenuType) {
         if type == .starred {
@@ -270,7 +323,7 @@ extension FolderViewController: FolderMenuDelegate {
     func didColorChageTapped() {
         showColorPicker()
     }
-  
+    
     func showColorPicker() {
         DispatchQueue.main.async {
             let colorPicker = UIColorPickerViewController()
@@ -280,6 +333,7 @@ extension FolderViewController: FolderMenuDelegate {
     }
 }
 
+//MARK: colorpicker delegate
 extension FolderViewController: UIColorPickerViewControllerDelegate {
     func colorPickerViewControllerDidFinish(_ viewController: UIColorPickerViewController) {
         let color = viewController.selectedColor
@@ -288,5 +342,59 @@ extension FolderViewController: UIColorPickerViewControllerDelegate {
             viewModel.updateFolderColor(color: hexColor)
         }
     }
+}
+
+//MARK: - tableview delegate and datasource
+
+extension FolderViewController: UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return viewModel.sortMenu.count
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = sortTableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        cell.textLabel?.text = viewModel.sortMenu[indexPath.row].title
+        let sortType = viewModel.sortMenu[indexPath.row].sortType
+        let sortTypeRawValue = defaults.string(forKey: "sortType") ?? SortType.dateAsc.rawValue
+        let selectedSortType = SortType(rawValue: sortTypeRawValue) ?? .dateAsc
+        if sortType == selectedSortType {
+            cell.accessoryType = .checkmark
+        } else {
+            cell.accessoryType = .none
+        }
+        cell.textLabel?.textAlignment = .left
+        return cell
+    }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let sortType = viewModel.sortMenu[indexPath.row].sortType
+        sortTableView.reloadData()
+        saveSortOption(sortType: sortType)
+        changeButtonTitle(newTitle: viewModel.sortMenu[indexPath.row].title)
+        tableView.isHidden = true
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 50
+    }
+    func saveSortOption(sortType: SortType) {
+        defaults.set(sortType.rawValue, forKey: "sortType")
+        reloadCollectionView()
+    }
+    
+    func changeButtonTitle(newTitle: String) {
+        var config = filterBtn.configuration
+        config?.title = "SortBy: \(newTitle)"
+        filterBtn.configuration = config
+        let title = "SortBy: \(newTitle)"
+        let titleSize = (title as NSString).size(withAttributes: [
+            .font: UIFont.systemFont(ofSize: 16)
+        ])
+        filterBtn.constraints.forEach { constraint in
+            if constraint.firstAttribute == .width {
+                filterBtn.removeConstraint(constraint)
+            }
+        }
+        filterBtn.widthAnchor.constraint(equalToConstant: titleSize.width + 30).isActive = true
+    }
 }

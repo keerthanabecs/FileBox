@@ -20,6 +20,7 @@ class FolderCell: UICollectionViewCell {
     var titleImageView: UIImageView!
     var moreButton: UIButton!
     var favoriteImage: UIImageView!
+    
     var moredelegate: MoreOptionDelegate?
     var index: Int!
     static let identifier = "FolderCell"

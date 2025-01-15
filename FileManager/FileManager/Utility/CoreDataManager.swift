@@ -40,6 +40,26 @@ class CoreDataManager {
         }
     }
     
+    func fetchSortedFolder(sort: String, asec: Bool) -> [FolderEntity]? {
+        var sortDescriptor: NSSortDescriptor
+        if sort == "folderName" {
+            sortDescriptor = NSSortDescriptor(key: "folderName", ascending: asec)
+        } else if sort == "createdDate" {
+            sortDescriptor = NSSortDescriptor(key: "createdDate", ascending: asec)
+        } else {
+            sortDescriptor = NSSortDescriptor(key: "folderName", ascending: asec)
+        }
+        let fetchRequest: NSFetchRequest<FolderEntity> = FolderEntity.fetchRequest()
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        do {
+            let folders = try context.fetch(fetchRequest)
+            return folders
+        } catch {
+            print("Error fetching folders: \(error)")
+            return nil
+        }
+    }
+    
     func updateOrDeleteFolder(folderName: String, folderPath: String, menuType: MenuType, isFavorite: Bool = false, color: String = "") -> (Bool, String) {
         let fetchRequest: NSFetchRequest<FolderEntity> = FolderEntity.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "folderName == %@ AND folderPath == %@", folderName,folderPath)
