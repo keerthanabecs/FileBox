@@ -85,6 +85,35 @@ class CoreDataManager {
             return(false, error.localizedDescription)
         }
     }
+    
+    func storeFileDetails(name: String, folder: FolderEntity, path: String, createdDate: Date) -> (Bool, String) {
+        let file = FileEntity(context: context)
+        file.fileName = name
+        file.filePath = path
+        file.createdDate = Date()
+        file.fileType = "photo"
+        file.folder = folder
+        do {
+            try context.save()
+            print("file created successfully")
+            return (true,"")
+        } catch {
+            print("failed: \(error.localizedDescription)")
+            return (false, error.localizedDescription)
+        }
+    }
+    
+    func fetchFiles(for folderName: String) -> [FileEntity] {
+        let fetchRequest: NSFetchRequest<FileEntity> = FileEntity.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "folder.folderName == %@", folderName)
+        do {
+            let files = try context.fetch(fetchRequest)
+            return files
+        } catch {
+            print("Error fetching files for folder \(folderName): \(error.localizedDescription)")
+            return []
+        }
+    }
 }
 
 

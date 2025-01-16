@@ -2,7 +2,7 @@
 //  FolderEntity+CoreDataProperties.swift
 //  FileManager
 //
-//  Created by Keerthana on 13/01/25.
+//  Created by Keerthana on 16/01/25.
 //
 //
 
@@ -21,6 +21,24 @@ extension FolderEntity {
     @NSManaged public var folderName: String?
     @NSManaged public var folderPath: String?
     @NSManaged public var isFavorite: Bool
+    @NSManaged public var files: NSSet?
+
+}
+
+// MARK: Generated accessors for files
+extension FolderEntity {
+
+    @objc(addFilesObject:)
+    @NSManaged public func addToFiles(_ value: FileEntity)
+
+    @objc(removeFilesObject:)
+    @NSManaged public func removeFromFiles(_ value: FileEntity)
+
+    @objc(addFiles:)
+    @NSManaged public func addToFiles(_ values: NSSet)
+
+    @objc(removeFiles:)
+    @NSManaged public func removeFromFiles(_ values: NSSet)
 
 }
 

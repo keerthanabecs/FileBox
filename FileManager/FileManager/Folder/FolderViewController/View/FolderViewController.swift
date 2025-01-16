@@ -44,6 +44,8 @@ class FolderViewController: UIViewController {
         view.addSubview(containerView)
         noFoldersLabel = UILabel()
         noFoldersLabel.text = "No folders have been created yet."
+        noFoldersLabel.numberOfLines = 2
+        noFoldersLabel.lineBreakMode = .byWordWrapping
         noFoldersLabel.textColor = .gray
         noFoldersLabel.textAlignment = .center
         noFoldersLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -183,17 +185,6 @@ class FolderViewController: UIViewController {
         addFolderBtn.isHidden = true
     }
     
-    @objc func createFolderAction() {
-        DispatchQueue.main.async { [self] in
-            if let name = folderCreationDialog.textField.text {
-                viewModel?.createFolder(folderName: name)
-                showFolderList()
-            } else {
-                print("please enter folder name")
-            }
-        }
-    }
-    
     func reloadCollectionView() {
        if defaults.string(forKey: "sortType") == nil {
            viewModel.fetchFolders()
@@ -206,9 +197,11 @@ class FolderViewController: UIViewController {
             if viewModel.folderEntities.count == 0 {
                 folderCollectionView.isHidden = true
                 noFoldersLabel.isHidden = false
+                filterBtn.isHidden = true
             } else {
                 folderCollectionView.isHidden = false
                 noFoldersLabel.isHidden = true
+                filterBtn.isHidden = false
             }
             self.folderCollectionView.reloadData()
         }
@@ -218,10 +211,6 @@ class FolderViewController: UIViewController {
         folderCreationDialog.isHidden = true
         addFolderBtn.isHidden = false
         reloadCollectionView()
-    }
-    
-    @objc func cancalBtnAction() {
-        showFolderList()
     }
     
     @objc func filterBtnTapped() {
@@ -236,6 +225,27 @@ class FolderViewController: UIViewController {
             }))
             self.present(alertController, animated: true)
         }
+    }
+}
+
+//MARK: - CreationDialog button Action
+extension FolderViewController {
+    
+    @objc func createFolderAction() {
+        DispatchQueue.main.async { [self] in
+            if let name = folderCreationDialog.textField.text, name != "" {
+                viewModel?.createFolder(folderName: name)
+                folderCreationDialog.textField.text = ""
+                showFolderList()
+            } else {
+                print("please enter folder name")
+            }
+        }
+    }
+    
+    @objc func cancalBtnAction() {
+        folderCreationDialog.textField.text = ""
+        showFolderList()
     }
 }
 
@@ -259,6 +269,14 @@ extension FolderViewController : UICollectionViewDelegate, UICollectionViewDataS
         return CGSize(width: (folderCollectionView.frame.size.width - 48)/2, height: 150)
     }
     
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let selectedFolder = viewModel.folderEntities[indexPath.row]
+        let filesVC = FilesViewController()
+        filesVC.viewModel = FileViewModel(folder: selectedFolder)
+        filesVC.modalPresentationStyle = .fullScreen
+        present(filesVC, animated: true)
+    }
+    
 }
 
 //MARK: - Menu button delegate
@@ -277,14 +295,12 @@ extension FolderViewController: MoreOptionDelegate {
 extension FolderViewController: FolderDelegate {
     func didFailed(msg: String) {
         showAlert(title: "Error", msg: msg)
-        
     }
     
     func didFolderColorChanged() {
         showAlert(title: "Success", msg: "Folder Color Changes Successfully") {
             self.reloadCollectionView()
         }
-        
     }
     
     func didFolderDeleted() {
@@ -384,9 +400,9 @@ extension FolderViewController: UITableViewDelegate, UITableViewDataSource {
     
     func changeButtonTitle(newTitle: String) {
         var config = filterBtn.configuration
-        config?.title = "SortBy: \(newTitle)"
+        config?.title = "\(newTitle)"
         filterBtn.configuration = config
-        let title = "SortBy: \(newTitle)"
+        let title = "\(newTitle)"
         let titleSize = (title as NSString).size(withAttributes: [
             .font: UIFont.systemFont(ofSize: 16)
         ])

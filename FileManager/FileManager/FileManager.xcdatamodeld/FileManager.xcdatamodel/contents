@@ -5,12 +5,14 @@
         <attribute name="fileName" optional="YES" attributeType="String"/>
         <attribute name="filePath" optional="YES" attributeType="String"/>
         <attribute name="fileType" optional="YES" attributeType="String"/>
+        <relationship name="folder" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FolderEntity" inverseName="files" inverseEntity="FolderEntity"/>
     </entity>
-    <entity name="FolderEntity" representedClassName="FolderEntity" syncable="YES">
+    <entity name="FolderEntity" representedClassName="FolderEntity" syncable="YES" codeGenerationType="class">
         <attribute name="createdDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="folderColor" optional="YES" attributeType="String"/>
         <attribute name="folderName" optional="YES" attributeType="String"/>
         <attribute name="folderPath" optional="YES" attributeType="String"/>
         <attribute name="isFavorite" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <relationship name="files" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FileEntity" inverseName="folder" inverseEntity="FileEntity"/>
     </entity>
 </model>

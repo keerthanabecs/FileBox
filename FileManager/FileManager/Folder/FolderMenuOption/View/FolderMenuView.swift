@@ -28,7 +28,7 @@ class FolderMenuView: UIViewController {
         viewModel.loadMenus()
         setup()
     }
-
+    
     func setup() {
         containerView = UIView()
         containerView.translatesAutoresizingMaskIntoConstraints = false
@@ -49,7 +49,7 @@ class FolderMenuView: UIViewController {
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         closeButton.tintColor = .black
         closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
-
+        
         titleStack = UIStackView(arrangedSubviews: [foldeNameLbl,closeButton])
         titleStack.axis = .horizontal
         titleStack.distribution = .fill
@@ -57,9 +57,7 @@ class FolderMenuView: UIViewController {
         titleStack.translatesAutoresizingMaskIntoConstraints = false
         
         containerView.addSubview(titleStack)
-        
         view.backgroundColor = .black.withAlphaComponent(0.2)
-        
         
         tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -69,8 +67,6 @@ class FolderMenuView: UIViewController {
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 44
         containerView.addSubview(tableView)
-        
-        
         
         NSLayoutConstraint.activate([
             containerView.topAnchor.constraint(equalTo: self.foldeNameLbl.topAnchor),
@@ -95,10 +91,10 @@ class FolderMenuView: UIViewController {
         self.dismiss(animated: true)
     }
     
-  
+    
 }
 
-//MARK:- tableview del
+//MARK:- tableview delegate and datasorce
 extension FolderMenuView: UITableViewDelegate,UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewModel.menus.count

@@ -5,6 +5,7 @@
 //  Created by Keerthana on 12/01/25.
 //
 import Foundation
+import UIKit
 
 
 enum FolderCreationError: Error {
@@ -20,7 +21,8 @@ enum FolderDeletionError: Error {
 }
 
 class StorageHelper {
-        
+    
+    
     static func createFolder(folderName: String) -> Result<String,FolderCreationError> {
         let fileManager = FileManager.default
         guard let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
@@ -62,6 +64,25 @@ class StorageHelper {
         } catch {
             print("Error deleting folder \(error.localizedDescription)")
             return .failure(.unknown)
+        }
+    }
+    
+    static func saveImageToSpecificFolder(image: UIImage, folderName: String, fileName: String) -> URL? {
+        guard let data = image.jpegData(compressionQuality: 1.0) else {
+            print("Could not get image data.")
+            return nil
+        }
+        let fileManager = FileManager.default
+        let documentsDirectoryURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let folderURL = documentsDirectoryURL.appendingPathComponent(folderName)
+        let fileURL = folderURL.appendingPathComponent(fileName)
+        do {
+            try data.write(to: fileURL)
+            print("Image saved to \(fileURL.path)")
+            return fileURL
+        } catch {
+            print("Error saving image: \(error.localizedDescription)")
+            return nil
         }
     }
 }

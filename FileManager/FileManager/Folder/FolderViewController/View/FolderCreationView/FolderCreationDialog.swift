@@ -43,7 +43,9 @@ class FolderCreationDialog: UIView {
         textField.borderStyle = .roundedRect
         textField.placeholder = "Enter folder name"
         textField.translatesAutoresizingMaskIntoConstraints = false
-        
+        textField.autocorrectionType = .no
+        textField.spellCheckingType = .no
+
         createButton = UIButton()
         createButton.setTitle("Create", for: .normal)
         createButton.layer.cornerRadius = 8
