@@ -5,46 +5,34 @@
    version = "2.0">
    <Breakpoints>
       <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.ExceptionBreakpoint">
-         <BreakpointContent
-            uuid = "42595657-EFAB-48FE-A5AD-A38FF37650B1"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            breakpointStackSelectionBehavior = "1"
-            scope = "1"
-            stopOnStyle = "0">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "10198DD9-CEBB-451F-86DB-30A5CADA3911"
+            uuid = "57C5D272-1D7B-40FE-A4A3-8E34D1E847B8"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "FileManager/Folder/FolderView/FolderViewController.swift"
+            filePath = "FileManager/Files/FileViewController/View/FilesViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "88"
-            endingLineNumber = "88"
-            landmarkName = "createFolderAction()"
+            startingLineNumber = "160"
+            endingLineNumber = "160"
+            landmarkName = "reloadCollectionView()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "7B5B417A-5E2F-483A-9557-C4463B4EDD7E"
+            uuid = "BC786177-7CCD-478A-8E1D-65F5494BB59D"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "FileManager/Folder/FolderView/FolderViewController.swift"
+            filePath = "FileManager/Files/FileViewController/View/FilesViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "92"
-            endingLineNumber = "92"
-            landmarkName = "createFolderAction()"
+            startingLineNumber = "163"
+            endingLineNumber = "163"
+            landmarkName = "reloadCollectionView()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
